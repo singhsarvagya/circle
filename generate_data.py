@@ -8,8 +8,8 @@ import csv
 import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--training_data_num', type=int, default=1000)
-parser.add_argument('--testing_data_num', type=int, default=200)
+parser.add_argument('--training_data_num', type=int, default=5000)
+parser.add_argument('--testing_data_num', type=int, default=1000)
 parser.add_argument('--data_set', type=str, default="data/")
 args = parser.parse_args()
 
