@@ -49,15 +49,15 @@ class ResNet(nn.Module):
         n = (depth - 2) // 6
 
         self.inplanes = 16
-
+        # self.avgpool_1 = nn.AvgPool2d(5)
         self.conv1 = nn.Conv2d(in_channels, 16, kernel_size=3, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(16)
         self.relu = nn.ReLU(inplace=True)
-        self.layer1 = self._make_layer(BasicBlock, 32, n)
-        self.layer2 = self._make_layer(BasicBlock, 64, n, stride=2)
-        self.layer3 = self._make_layer(BasicBlock, 128, n, stride=2)
+        self.layer1 = self._make_layer(BasicBlock, 16, n)
+        self.layer2 = self._make_layer(BasicBlock, 32, n, stride=2)
+        self.layer3 = self._make_layer(BasicBlock, 64, n, stride=2)
         self.avgpool_2 = nn.AvgPool2d(10)
-        self.fc = nn.Linear(64*50, output)
+        self.fc = nn.Linear(64*5*5, output)
 
     def _make_layer(self, block, planes, blocks, stride=1):
         downsample = None
@@ -77,6 +77,7 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
+        # x = self.avgpool_1(x)
         x = self.conv1(x)  # 1x40x40 -> 16x40x40
         x = self.bn1(x)
         x = self.relu(x)
@@ -88,5 +89,6 @@ class ResNet(nn.Module):
         x = self.avgpool_2(x)
         x = x.view(x.size(0), -1)
         x = self.fc(x)
+
 
         return x

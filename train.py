@@ -20,7 +20,7 @@ parser.add_argument('--data_set', type=str, default='data/')
 parser.add_argument('--save_model', type=bool, default=True)
 parser.add_argument('--num_epochs', type=int, default=40)
 parser.add_argument('--lr', type=float, default=0.01)
-parser.add_argument('--batch_size', type=int, default=64)
+parser.add_argument('--batch_size', type=int, default=16)
 args = parser.parse_args()
 
 num_epochs = int(args.num_epochs)
@@ -82,15 +82,27 @@ if is_use_cuda:
     net = nn.DataParallel(net, device_ids=range(torch.cuda.device_count()))
 
 # change loss criterion
-criterion = nn.MSELoss()
+criterion = nn.L1Loss()
 print(sum(p.numel() for p in net.parameters()))
+
+
+# def my_loss(output, target):
+#     loss = torch.mean((output - target)**2)
+#     return loss
+#
+#
+# def my_loss2(output, target):
+#     w = torch.tensor([[0.4], [0.4], [2]], dtype=torch.float32).cuda()
+#     t = torch.autograd.Variable(w, requires_grad=True)
+#     loss = torch.mean(((torch.abs(output - target)))@t)
+#     return loss
 
 
 
 def train(epoch):
     net.train()
     train_loss = 0
-    optimizer = optim.Adam(net.parameters(), lr=lr_schedule(lr, epoch))
+    optimizer = optim.Adam(net.parameters(), lr=lr_schedule(lr, epoch), weight_decay=0.001)
 
     print('Training Epoch: #%d, LR: %.4f' % (epoch, lr_schedule(lr, epoch)))
     for idx, (inputs, labels) in enumerate(train_loader):
