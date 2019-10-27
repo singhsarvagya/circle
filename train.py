@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--depth', type=int, default=14)
 parser.add_argument('--data_set', type=str, default='data/')
 parser.add_argument('--save_model', type=bool, default=True)
-parser.add_argument('--num_epochs', type=int, default=50)
+parser.add_argument('--num_epochs', type=int, default=40)
 parser.add_argument('--lr', type=float, default=0.01)
 parser.add_argument('--batch_size', type=int, default=64)
 args = parser.parse_args()
@@ -48,8 +48,8 @@ def conv_init(m):
 # for reducing the learning after certain epoch
 def lr_schedule(learn_rate, epoch):
     optim_factor = 0
-    if epoch > 35:
-        optim_factor = 2.5
+    if epoch > 30:
+        optim_factor = 3
     if epoch > 20:
         optim_factor = 2
     elif epoch > 10:
