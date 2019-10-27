@@ -131,9 +131,8 @@ def test(epoch):
 
     if args.save_model:
         min_loss = test_loss
-        if min_loss < test_loss:
-            file_path = dir_name + "/model" + ".pth"
-            torch.save(net.state_dict(), file_path)
+        file_path = dir_name + "/model" + ".pth"
+        torch.save(net.state_dict(), file_path)
 
 
 # making a checkpoint directory if it doesn't exists
