@@ -5,7 +5,6 @@ import scipy.misc
 import argparse
 import os
 import csv
-import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--training_data_num', type=int, default=5000)

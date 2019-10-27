@@ -9,7 +9,6 @@ import scipy.misc
 
 import torchvision.transforms as transforms
 
-net = None
 is_use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if is_use_cuda else "cpu")
 loader = transforms.Compose([transforms.Scale(200, 200), transforms.ToTensor()])
@@ -68,9 +67,6 @@ def iou(params0, params1):
 
 
 if __name__ == "__main__":
-    # image = Image.open("./data/test/img0.png")
-    # image = loader(image).float().resize(1, 1, 200, 200)
-    # print(net(image.cuda()))
     results = []
     for _ in range(1000):
         params, img = noisy_circle(200, 50, 2)

@@ -37,9 +37,10 @@ min_loss = 0.
 # initializing the parameters in the network
 def conv_init(m):
     class_name = m.__class__.__name__
-    if class_name.find('Conv') != -1 and m.bias is not None:
+    if class_name.find('Conv') != -1:
         init.xavier_uniform_(m.weight, gain=np.sqrt(2))
-        init.constant_(m.bias, 0)
+        if m.bias is not None:
+            init.constant_(m.bias, 0)
     elif class_name.find('BatchNorm') != -1:
         init.constant_(m.weight, 1)
         init.constant_(m.bias, 0)
@@ -86,23 +87,10 @@ criterion = nn.L1Loss()
 print(sum(p.numel() for p in net.parameters()))
 
 
-# def my_loss(output, target):
-#     loss = torch.mean((output - target)**2)
-#     return loss
-#
-#
-# def my_loss2(output, target):
-#     w = torch.tensor([[0.4], [0.4], [2]], dtype=torch.float32).cuda()
-#     t = torch.autograd.Variable(w, requires_grad=True)
-#     loss = torch.mean(((torch.abs(output - target)))@t)
-#     return loss
-
-
-
 def train(epoch):
     net.train()
     train_loss = 0
-    optimizer = optim.Adam(net.parameters(), lr=lr_schedule(lr, epoch), weight_decay=0.001)
+    optimizer = optim.Adam(net.parameters(), lr=lr_schedule(lr, epoch))
 
     print('Training Epoch: #%d, LR: %.4f' % (epoch, lr_schedule(lr, epoch)))
     for idx, (inputs, labels) in enumerate(train_loader):
@@ -141,10 +129,11 @@ def test(epoch):
                           test_loss / (batch_size * (idx + 1))))
         sys.stdout.flush()
 
-    if args.save_model: #and min_loss < test_loss:
+    if args.save_model:
         min_loss = test_loss
-        file_path = dir_name + "/model" + ".pth"
-        torch.save(net.state_dict(), file_path)
+        if min_loss < test_loss:
+            file_path = dir_name + "/model" + ".pth"
+            torch.save(net.state_dict(), file_path)
 
 
 # making a checkpoint directory if it doesn't exists
@@ -164,9 +153,3 @@ for _epoch in range(start_epoch, start_epoch + num_epochs):
     print('Epoch #%d Cost %ds' % (_epoch, end_time - start_time))
 
 print('Min Loss@1: %.4f' % (min_loss))
-
-# sample test example
-image = Image.open("./data/test/img0.png")
-image = transform_test(image).float().resize(1, 1, 200, 200)
-print (net(image.cuda()))
-print ("146,72,18")
