@@ -31,7 +31,7 @@ batch_size = int(args.batch_size)
 # using GPU if available
 is_use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if is_use_cuda else "cpu")
-min_loss = 0.
+min_loss = float("inf")
 
 # Create and configure logger
 logging.basicConfig(filename="training_output.txt", format='%(asctime)s %(message)s', filemode='w')
