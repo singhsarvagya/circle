@@ -6,20 +6,27 @@ import torch
 import torch.nn as nn
 from PIL import Image
 import scipy.misc
-
+import os
 import torchvision.transforms as transforms
 
+
+loader = transforms.Compose([transforms.ToTensor()])
+
+# checking if the GPU is available for inference
 is_use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if is_use_cuda else "cpu")
-loader = transforms.Compose([transforms.Scale(200, 200), transforms.ToTensor()])
+
+# initializing the model
 net = ResNet(depth=14, in_channels=1, output=3)
 # moving the net to GPU for testing
 if is_use_cuda:
     net.to(device)
     net = nn.DataParallel(net, device_ids=range(torch.cuda.device_count()))
+
 # loading the network parameters
 net.load_state_dict(torch.load("./checkpoints/model.pth"))
 net.eval()
+
 
 def draw_circle(img, row, col, rad):
     rr, cc, val = circle_perimeter_aa(row, col, rad)
@@ -75,3 +82,4 @@ if __name__ == "__main__":
         results.append(iou(params, detected))
     results = np.array(results)
     print((results > 0.7).mean())
+    os.remove("img.png")

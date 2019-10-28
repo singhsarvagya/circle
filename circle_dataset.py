@@ -29,10 +29,10 @@ class CirclesDataset(Dataset):
             idx = idx.tolist()
 
         img = Image.open(self.root_dir + self.circles.iloc[idx, 0])
-        params = self.circles.iloc[idx, 1:]
-        params = np.array([params])
-        params = torch.from_numpy(params.astype('float32').reshape(3))
+        label = self.circles.iloc[idx, 1:]
+        label = np.array([label])
+        label = torch.from_numpy(label.astype('float32').reshape(3))
 
         if self.transform:
             img = self.transform(img)
-        return img, params
+        return img, label

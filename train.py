@@ -11,7 +11,6 @@ import argparse
 import math
 import numpy as np
 import sys
-from PIL import Image
 import os
 
 parser = argparse.ArgumentParser()
