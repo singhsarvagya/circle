@@ -9,6 +9,7 @@ from models.resnet import ResNet
 from circle_dataset import CirclesDataset
 import argparse
 import math
+import logging
 import numpy as np
 import sys
 import os
@@ -31,6 +32,13 @@ batch_size = int(args.batch_size)
 is_use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if is_use_cuda else "cpu")
 min_loss = 0.
+
+# Create and configure logger
+logging.basicConfig(filename="training_output.txt", format='%(asctime)s %(message)s', filemode='w')
+# Creating an object
+logger = logging.getLogger()
+# Setting the threshold of logger to DEBUG
+logger.setLevel(logging.INFO)
 
 
 # initializing the parameters in the network
@@ -101,37 +109,45 @@ def train(epoch):
         loss.backward()
         optimizer.step()
         train_loss += loss.item()
-
         sys.stdout.write('\r')
         sys.stdout.write('[%s] Training Epoch [%d/%d] Iter[%d/%d]\t\tLoss: %.4f' %
                          (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())),
                           epoch, num_epochs, idx, len(train_dataset) // batch_size,
                           train_loss / (batch_size * (idx + 1))))
         sys.stdout.flush()
+        logger.info('Training Epoch [%d/%d] Iter[%d/%d]\t\tLoss: %.4f' %
+                    (epoch, num_epochs, idx, len(train_dataset) // batch_size,
+                     train_loss / (batch_size * (idx + 1))))
 
 
 def test(epoch):
     global min_loss
     net.eval()
     test_loss = 0
+    total = 0
     for idx, (inputs, labels) in enumerate(test_loader):
         if is_use_cuda:
             inputs, labels = inputs.to(device), labels.to(device)
         outputs = net(inputs)
         loss = criterion(outputs, labels)
         test_loss += loss.item()
-
+        total += labels.size(0)
         sys.stdout.write('\r')
         sys.stdout.write('[%s] Testing Epoch [%d/%d] Iter[%d/%d]\t\tLoss: %.4f' %
                          (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())),
                           epoch, num_epochs, idx, len(test_dataset) // test_loader.batch_size,
                           test_loss / (batch_size * (idx + 1))))
         sys.stdout.flush()
+        logger.info('Testing Epoch [%d/%d] Iter[%d/%d]\t\tLoss: %.4f' %
+                    (epoch, num_epochs, idx, len(test_dataset) // test_loader.batch_size,
+                     test_loss / (batch_size * (idx + 1))))
 
-    if args.save_model:
-        min_loss = test_loss
-        file_path = dir_name + "/model" + ".pth"
-        torch.save(net.state_dict(), file_path)
+    if min_loss > test_loss/total:
+        min_loss = test_loss/total
+        if args.save_model:
+            file_path = dir_name + "/model" + ".pth"
+            torch.save(net.state_dict(), file_path)
+            logger.info("Saving the Model")
 
 
 # making a checkpoint directory if it doesn't exists
@@ -150,4 +166,5 @@ for _epoch in range(start_epoch, start_epoch + num_epochs):
     end_time = time.time()
     print('Epoch #%d Cost %ds' % (_epoch, end_time - start_time))
 
-print('Min Loss@1: %.4f' % (min_loss))
+print('Min Loss@1: %.4f' % min_loss)
+logger.info('Min Loss@1: %.4f' % min_loss)
