@@ -51,11 +51,11 @@ class ResNet(nn.Module):
         self.conv1 = nn.Conv2d(in_channels, 16, kernel_size=3, padding=1, bias=True)
         self.bn1 = nn.BatchNorm2d(16)
         self.relu = nn.ReLU(inplace=True)
-        self.layer1 = self._make_layer(BasicBlock, 16, n)
-        self.layer2 = self._make_layer(BasicBlock, 32, n, stride=2)
-        self.layer3 = self._make_layer(BasicBlock, 64, n, stride=2)
+        self.layer1 = self._make_layer(BasicBlock, 32, n)
+        self.layer2 = self._make_layer(BasicBlock, 64, n, stride=2)
+        self.layer3 = self._make_layer(BasicBlock, 128, n, stride=2)
         self.avgpool = nn.AvgPool2d(10)
-        self.fc = nn.Linear(64*5*5, output)
+        self.fc = nn.Linear(128*5*5, output)
 
     def _make_layer(self, block, planes, blocks, stride=1):
         downsample = None
