@@ -74,12 +74,12 @@ def iou(params0, params1):
 
 
 if __name__ == "__main__":
-    results = []
-    for _ in range(1000):
-        params, img = noisy_circle(200, 50, 2)
-        scipy.misc.imsave("img.png", img)
-        detected = find_circle()
-        results.append(iou(params, detected))
-    results = np.array(results)
-    print((results > 0.7).mean())
-    os.remove("img.png")
+    # results = []
+    # for _ in range(1000):
+    #     params, img = noisy_circle(200, 50, 2)
+    #     scipy.misc.imsave("img.png", img)
+    #     detected = find_circle()
+    #     results.append(iou(params, detected))
+    # results = np.array(results)
+    # print((results > 0.7).mean())
+    # os.remove("img.png")

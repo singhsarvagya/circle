@@ -99,7 +99,7 @@ def train(epoch):
     train_loss = 0
     optimizer = optim.Adam(net.parameters(), lr=lr_schedule(lr, epoch))
 
-    print('Training Epoch: #%d, LR: %.4f' % (epoch, lr_schedule(lr, epoch)))
+    print('Training Epoch: #%d, LR: %.5f' % (epoch, lr_schedule(lr, epoch)))
     for idx, (inputs, labels) in enumerate(train_loader):
         if is_use_cuda:
             inputs, labels = inputs.to(device), labels.to(device)
