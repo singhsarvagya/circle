@@ -77,7 +77,7 @@ def iou(params0, params1):
 if __name__ == "__main__":
     results = []
     for _ in range(1000):
-        params, img = noisy_circle(200, 50, 0)
+        params, img = noisy_circle(200, 50, 2)
         # for some reason passing the np array
         # directly to the find_circle function
         # is not working, so I am saving the
