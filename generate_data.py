@@ -81,7 +81,6 @@ def generate_samples(dir, csv_name, num):
 if __name__ == "__main__":
     # creating directory to store training and test data
     create_data_directory()
-
     # generating training samples
     generate_samples(args.data_set+"train/", "training.csv", args.training_data_num)
     # generating testing samples

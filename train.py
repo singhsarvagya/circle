@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--depth', type=int, default=14)
 parser.add_argument('--data_set', type=str, default='data/')
 parser.add_argument('--save_model', type=bool, default=True)
-parser.add_argument('--num_epochs', type=int, default=40)
+parser.add_argument('--num_epochs', type=int, default=45)
 parser.add_argument('--lr', type=float, default=0.01)
 parser.add_argument('--batch_size', type=int, default=16)
 args = parser.parse_args()
@@ -56,11 +56,11 @@ def conv_init(m):
 # for reducing the learning after certain epoch
 def lr_schedule(learn_rate, epoch):
     optim_factor = 0
-    if epoch > 30:
+    if epoch > 35:
         optim_factor = 3
-    if epoch > 20:
+    if epoch > 25:
         optim_factor = 2
-    elif epoch > 10:
+    elif epoch > 15:
         optim_factor = 1
     return learn_rate / math.pow(10, optim_factor)
 
@@ -91,7 +91,7 @@ if is_use_cuda:
 
 # change loss criterion
 criterion = nn.L1Loss()
-print(sum(p.numel() for p in net.parameters()))
+print("Number of parameters in the network: {}".format(sum(p.numel() for p in net.parameters())))
 
 
 def train(epoch):
@@ -115,9 +115,7 @@ def train(epoch):
                           epoch, num_epochs, idx, len(train_dataset) // batch_size,
                           train_loss / (batch_size * (idx + 1))))
         sys.stdout.flush()
-        logger.info('Training Epoch [%d/%d] Iter[%d/%d]\t\tLoss: %.4f' %
-                    (epoch, num_epochs, idx, len(train_dataset) // batch_size,
-                     train_loss / (batch_size * (idx + 1))))
+    logger.info('Training Epoch [%d/%d] \t\tLoss: %.4f' % (epoch, num_epochs, train_loss / (batch_size * (idx + 1))))
 
 
 def test(epoch):
@@ -138,9 +136,7 @@ def test(epoch):
                           epoch, num_epochs, idx, len(test_dataset) // test_loader.batch_size,
                           test_loss / (batch_size * (idx + 1))))
         sys.stdout.flush()
-        logger.info('Testing Epoch [%d/%d] Iter[%d/%d]\t\tLoss: %.4f' %
-                    (epoch, num_epochs, idx, len(test_dataset) // test_loader.batch_size,
-                     test_loss / (batch_size * (idx + 1))))
+    logger.info('Testing Epoch [%d/%d] \t\tLoss: %.4f' % (epoch, num_epochs, test_loss / (batch_size * (idx + 1))))
 
     if min_loss > test_loss/total:
         min_loss = test_loss/total

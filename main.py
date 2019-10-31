@@ -10,6 +10,7 @@ import os
 import torchvision.transforms as transforms
 
 
+# image transformation function
 loader = transforms.Compose([transforms.ToTensor()])
 
 # checking if the GPU is available for inference
@@ -22,7 +23,6 @@ net = ResNet(depth=14, in_channels=1, output=3)
 if is_use_cuda:
     net.to(device)
     net = nn.DataParallel(net, device_ids=range(torch.cuda.device_count()))
-
 # loading the network parameters
 net.load_state_dict(torch.load("./checkpoints/model.pth"))
 net.eval()
@@ -53,10 +53,11 @@ def noisy_circle(size, radius, noise):
 
 
 def find_circle():
+    # reading the image and applying transformation to it
     image = Image.open("./img.png")
     image = loader(image).float().resize(1, 1, 200, 200)
+    # inferring the results from the image
     output = net(image.cuda()).cpu().detach().numpy()
-    # Fill in this function
     return output[0][0], output[0][1], output[0][2]
 
 
@@ -74,12 +75,18 @@ def iou(params0, params1):
 
 
 if __name__ == "__main__":
-    # results = []
-    # for _ in range(1000):
-    #     params, img = noisy_circle(200, 50, 2)
-    #     scipy.misc.imsave("img.png", img)
-    #     detected = find_circle()
-    #     results.append(iou(params, detected))
-    # results = np.array(results)
-    # print((results > 0.7).mean())
-    # os.remove("img.png")
+    results = []
+    for _ in range(1000):
+        params, img = noisy_circle(200, 50, 0)
+        # for some reason passing the np array
+        # directly to the find_circle function
+        # is not working, so I am saving the
+        # array into an image, and find circle
+        # function is reading the image and applying
+        # transformation to that image
+        scipy.misc.imsave("img.png", img)
+        detected = find_circle()
+        results.append(iou(params, detected))
+    results = np.array(results)
+    print((results > 0.7).mean())
+    os.remove("img.png")
